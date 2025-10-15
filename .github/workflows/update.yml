@@ -6,6 +6,9 @@ on:
   workflow_dispatch:      # Permet de le lancer manuellement
   push:                   # Se lance aussi si tu modifies le dépôt
 
+permissions:
+  contents: write  # ✅ Autorise le bot à push des commits
+
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
