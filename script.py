@@ -1,35 +1,55 @@
-
 from icalendar import Calendar
 import requests
+import os
 
-# URL du calendrier d'origine
-SOURCE_URL = "https://cerfal.ymag.cloud/index.php/planning/ical/4C5147AA-B18B-4694-A195-F5214220B11F/"
-# Nom de l'événement à filtrer
-EVENT_TO_REMOVE = "Entreprise"
-# Fichier de sortie
-OUTPUT_FILE = "filtré.ics"
+# === CONFIGURATION ===
+# URL du calendrier source (.ics)
+SOURCE_URL = "https://cerfal.ymag.cloud/index.php/planning/ical/4C5147AA-B18B-4694-A195-F5214220B11F/"  # 👉 remplace par ton URL réelle
+# Texte à filtrer (événements contenant ce texte dans le titre seront supprimés)
+EVENT_TO_REMOVE = "Entreprise"             # 👉 remplace par ton mot-clé
+# Dossier et nom du fichier de sortie
+OUTPUT_DIR = "docs"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "filtré.ics")
 
-# Télécharger le calendrier source
+# === CODE ===
+print("Téléchargement du calendrier source...")
 response = requests.get(SOURCE_URL)
 response.raise_for_status()
 
-# Charger le calendrier
+# Charger le calendrier d'origine
 cal = Calendar.from_ical(response.content)
 
-# Nouveau calendrier filtré
+# Créer un nouveau calendrier
 filtered_cal = Calendar()
+
+# Copier les métadonnées du calendrier (titre, prodid, etc.)
 for key, value in cal.items():
     filtered_cal.add(key, value)
 
-# Garder seulement les événements qui ne contiennent PAS le texte interdit
+# S'assurer que le dossier docs/ existe
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Compter les événements supprimés
+count_removed = 0
+count_kept = 0
+
+# Parcourir les événements et filtrer
 for component in cal.walk():
     if component.name == "VEVENT":
         summary = str(component.get("summary", ""))
-        if EVENT_TO_REMOVE.lower() not in summary.lower():
+        if EVENT_TO_REMOVE.lower() in summary.lower():
+            count_removed += 1
+        else:
+            filtered_cal.add_component(component)
+            count_kept += 1
+    else:
+        # Conserver les autres composants (VTIMEZONE, etc.)
+        if component.name != "VCALENDAR":
             filtered_cal.add_component(component)
 
-# Sauvegarder le résultat
+# Sauvegarder le fichier final
 with open(OUTPUT_FILE, "wb") as f:
     f.write(filtered_cal.to_ical())
 
-print(f"Calendrier filtré enregistré dans {OUTPUT_FILE}")
+print(f"✅ Calendrier filtré enregistré dans {OUTPUT_FILE}")
+print(f"📅 {count_kept} événements gardés, 🚫 {count_removed} supprimés.")
