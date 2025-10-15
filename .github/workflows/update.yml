@@ -3,21 +3,22 @@ name: Mettre à jour le calendrier filtré
 on:
   schedule:
     - cron: "*/30 * * * *"  # toutes les 30 minutes
-  workflow_dispatch:      # Permet de le lancer manuellement depuis GitHub
-  push:                   # Se lance aussi si tu modifies le dépôt
+  workflow_dispatch:
+  push:
 
 permissions:
-  contents: write  # ✅ Autorise le bot à pousser des commits
+  contents: write  # autorise le push
 
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🧾 Cloner le dépôt
+      - name: 🧾 Checkout du dépôt
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true  # ✅ permet au bot de pousser avec GITHUB_TOKEN
+          fetch-depth: 0             # ✅ récupère tout l’historique
 
       - name: 🐍 Installer Python
         uses: actions/setup-python@v5
@@ -25,19 +26,15 @@ jobs:
           python-version: "3.x"
 
       - name: 📦 Installer les dépendances
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: ⚙️ Exécuter le script de filtrage
-        run: |
-          python script.py
+        run: python script.py
 
-      - name: 💾 Commit et push du fichier filtré
+      - name: 💾 Commit et push
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git checkout main
-          git pull --rebase origin main || true
           git add docs/filtré.ics
           git commit -m "Mise à jour automatique du calendrier" || echo "Aucun changement à committer"
-          git push origin main --force
+          git push origin main
