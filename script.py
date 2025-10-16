@@ -4,9 +4,9 @@ import os
 
 # === CONFIGURATION ===
 # URL du calendrier source (.ics)
-SOURCE_URL = "https://cerfal.ymag.cloud/index.php/planning/ical/4C5147AA-B18B-4694-A195-F5214220B11F/"  # 👉 remplace par ton URL réelle
+SOURCE_URL = "https://cerfal.ymag.cloud/index.php/planning/ical/4C5147AA-B18B-4694-A195-F5214220B11F/"  
 # Texte à filtrer (événements contenant ce texte dans le titre seront supprimés)
-EVENT_TO_REMOVE = "Entreprise"             # 👉 remplace par ton mot-clé
+EVENT_TO_REMOVE = "Entreprise"            
 # Dossier et nom du fichier de sortie
 OUTPUT_DIR = "docs"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "filtré.ics")
