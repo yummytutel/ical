@@ -51,5 +51,5 @@ for component in cal.walk():
 with open(OUTPUT_FILE, "wb") as f:
     f.write(filtered_cal.to_ical())
 
-print(f"✅ Calendrier filtré enregistré dans {OUTPUT_FILE}")
-print(f"📅 {count_kept} événements gardés, 🚫 {count_removed} supprimés.")
+print(f" Calendrier filtré enregistré dans {OUTPUT_FILE}")
+print(f" {count_kept} événements gardés,  {count_removed} supprimés.")
